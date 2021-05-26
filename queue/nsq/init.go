@@ -1,9 +1,9 @@
 package nsq
 
 import (
+	"banklampung-core/logs"
 	"fmt"
 	goNsq "github.com/nsqio/go-nsq"
-	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 )
 
 var producer *goNsq.Producer

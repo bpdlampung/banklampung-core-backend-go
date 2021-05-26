@@ -1,10 +1,10 @@
 package redis
 
 import (
+	"banklampung-core/logs"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"strconv"
 )
 

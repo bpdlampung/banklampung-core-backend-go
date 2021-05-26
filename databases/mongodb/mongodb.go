@@ -1,12 +1,12 @@
 package mongodb
 
 import (
+	"banklampung-core/entities"
+	"banklampung-core/errors"
+	"banklampung-core/helpers"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/bpdlampung/banklampung-core-backend-go/entities"
-	"github.com/bpdlampung/banklampung-core-backend-go/errors"
-	"github.com/bpdlampung/banklampung-core-backend-go/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

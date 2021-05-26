@@ -1,9 +1,9 @@
 package responses
 
 import (
+	"banklampung-core/errors"
+	"banklampung-core/logs"
 	"github.com/gin-gonic/gin"
-	"github.com/bpdlampung/banklampung-core-backend-go/errors"
-	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"net/http"
 	"time"
 )

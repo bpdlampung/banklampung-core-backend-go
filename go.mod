@@ -1,4 +1,4 @@
-module github.com/bpdlampung/banklampung-core-backend-go
+module banklampung-core
 
 go 1.15
 

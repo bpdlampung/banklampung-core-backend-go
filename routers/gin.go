@@ -1,10 +1,10 @@
 package routers
 
 import (
+	"banklampung-core/enums"
+	"banklampung-core/errors"
+	"banklampung-core/responses"
 	"github.com/gin-gonic/gin"
-	"github.com/bpdlampung/banklampung-core-backend-go/enums"
-	"github.com/bpdlampung/banklampung-core-backend-go/errors"
-	"github.com/bpdlampung/banklampung-core-backend-go/responses"
 	"os"
 )
 

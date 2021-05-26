@@ -1,9 +1,9 @@
 package encryption
 
 import (
+	"banklampung-core/entities"
+	"banklampung-core/helpers"
 	"fmt"
-	"github.com/bpdlampung/banklampung-core-backend-go/entities"
-	"github.com/bpdlampung/banklampung-core-backend-go/helpers"
 	"testing"
 	"time"
 )

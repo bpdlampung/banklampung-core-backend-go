@@ -1,9 +1,9 @@
 package email
 
 import (
+	"banklampung-core/logs"
 	"crypto/tls"
 	"fmt"
-	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"gopkg.in/gomail.v2"
 )
 
