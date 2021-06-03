@@ -1,8 +1,8 @@
 package nsq
 
 import (
-	"banklampung-core/logs"
 	"fmt"
+	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	goNsq "github.com/nsqio/go-nsq"
 )
 

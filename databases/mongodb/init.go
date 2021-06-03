@@ -1,9 +1,9 @@
 package mongodb
 
 import (
-	"banklampung-core/logs"
 	"context"
 	"fmt"
+	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"strings"

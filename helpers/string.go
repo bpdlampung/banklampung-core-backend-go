@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"os"
 )
 
 // Adapted from https://elithrar.github.io/article/generating-secure-random-numbers-crypto-rand/
@@ -77,4 +78,14 @@ func RandomNumericString(n int) (string, error) {
 func RandomStringURLSafe(n int) (string, error) {
 	b, err := RandomBytes(n)
 	return base64.URLEncoding.EncodeToString(b), err
+}
+
+func GetEnvAndValidate(key string) string {
+	value := os.Getenv(key)
+
+	if len(value) == 0 {
+		panic(fmt.Sprintf("env [%s] not found", key))
+	}
+
+	return value
 }

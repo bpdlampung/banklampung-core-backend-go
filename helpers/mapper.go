@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"banklampung-core/errors"
 	"encoding/json"
+	"github.com/bpdlampung/banklampung-core-backend-go/errors"
 )
 
 func InterfaceToStruct(from interface{}, to interface{}) error {

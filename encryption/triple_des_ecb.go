@@ -1,12 +1,12 @@
 package encryption
 
 import (
-	"banklampung-core/errors"
 	"bytes"
 	"crypto/des"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/bpdlampung/banklampung-core-backend-go/errors"
 	"strings"
 )
 

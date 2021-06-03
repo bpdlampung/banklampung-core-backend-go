@@ -1,10 +1,10 @@
 package kafka
 
 import (
-	"banklampung-core/logs"
 	"errors"
 	"fmt"
 	goKafka "github.com/Shopify/sarama"
+	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"time"
 )
 

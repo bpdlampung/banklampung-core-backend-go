@@ -1,10 +1,10 @@
 package middlewares
 
 import (
-	"banklampung-core/encryption"
-	"banklampung-core/entities"
-	"banklampung-core/errors"
-	"banklampung-core/helpers"
+	"github.com/bpdlampung/banklampung-core-backend-go/encryption"
+	"github.com/bpdlampung/banklampung-core-backend-go/entities"
+	"github.com/bpdlampung/banklampung-core-backend-go/errors"
+	"github.com/bpdlampung/banklampung-core-backend-go/helpers"
 	"github.com/gin-gonic/gin"
 	"os"
 )

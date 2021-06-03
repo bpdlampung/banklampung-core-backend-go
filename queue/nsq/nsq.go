@@ -1,8 +1,8 @@
 package nsq
 
 import (
-	"banklampung-core/errors"
 	"fmt"
+	"github.com/bpdlampung/banklampung-core-backend-go/errors"
 	goNsq "github.com/nsqio/go-nsq"
 	"time"
 )
