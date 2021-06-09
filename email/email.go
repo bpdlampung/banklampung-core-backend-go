@@ -12,6 +12,7 @@ type EmailConfig struct {
 	emailDialler *gomail.Dialer
 	logger       logs.Collections
 	mailSender   string
+	mailTrap     string
 	environment  enums.Environment
 }
 
@@ -24,7 +25,7 @@ type SendMail struct {
 	Bcc     []string
 }
 
-func InitConfig(mailPort int, mailHost, mailSender, username, password string, tlsStatus bool, logger logs.Collections, env enums.Environment) EmailConfig {
+func InitConfig(mailPort int, mailHost, mailSender, username, password, mailTrap string, tlsStatus bool, logger logs.Collections, env enums.Environment) EmailConfig {
 	emailDialler := gomail.NewDialer(mailHost,
 		mailPort,
 		username,
@@ -37,12 +38,13 @@ func InitConfig(mailPort int, mailHost, mailSender, username, password string, t
 		emailDialler: emailDialler,
 		logger:       logger,
 		environment:  env,
+		mailTrap:     mailTrap,
 	}
 }
 
 func (cfg EmailConfig) SendMail(payload SendMail) error {
 	if cfg.environment != enums.Production {
-		payload.To = []string{"programmer.banklampung@gmail.com"}
+		payload.To = []string{cfg.mailTrap}
 	}
 
 	mailer := gomail.NewMessage()

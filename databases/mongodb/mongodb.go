@@ -26,29 +26,11 @@ func NewMongoDBLogger(mongoClient Mongodb, collectionName string) Collections {
 	}
 }
 
-const (
-	SortAscending  = `asc`
-	SortDescending = `desc`
-)
-
-type Sort struct {
-	FieldName string
-	By        string
-}
-
-func (s Sort) buildSortBy() int {
-	if s.By == SortDescending {
-		return -1
-	}
-
-	return 1
-}
-
 type FindAllData struct {
 	Result    interface{}
 	CountData *int64
 	Filter    interface{}
-	Sort      *Sort
+	Sort      []entities.Sort
 	Page      int64
 	Size      int64
 }
@@ -65,12 +47,18 @@ func (m MongoDBLogger) Find(payload FindAllData, ctx context.Context) error {
 
 	findOption := options.Find()
 
-	if payload.Sort != nil {
-		findOption.SetSort(bson.D{{payload.Sort.FieldName, payload.Sort.buildSortBy()}})
+	if payload.Sort != nil && len(payload.Sort) > 0 {
+		for x := range payload.Sort {
+			findOption.SetSort(bson.D{{payload.Sort[x].FieldName, payload.Sort[x].BuildSortBy()}})
+		}
 	}
 
 	findOption.Limit = &payload.Size
 	findOption.Skip = payload.generateOptionSkip()
+
+	j, _ := json.Marshal(payload.Filter)
+	msg := fmt.Sprintf("query: %s", string(j))
+	m.mongodb.logger.Debug(msg)
 
 	cursor, err := collection.Find(ctx, payload.Filter, findOption)
 
@@ -306,7 +294,7 @@ func (m MongoDBLogger) Aggregate(payload Aggregate, ctx context.Context) error {
 type FindMany struct {
 	Result interface{}
 	Filter interface{}
-	Sort   *Sort
+	Sort   []entities.Sort
 }
 
 func (m MongoDBLogger) FindMany(payload FindMany, ctx context.Context) error {
@@ -316,8 +304,10 @@ func (m MongoDBLogger) FindMany(payload FindMany, ctx context.Context) error {
 
 	findOption := options.Find()
 
-	if payload.Sort != nil {
-		findOption.SetSort(bson.D{{payload.Sort.FieldName, payload.Sort.buildSortBy()}})
+	if payload.Sort != nil && len(payload.Sort) > 0 {
+		for x := range payload.Sort {
+			findOption.SetSort(bson.D{{payload.Sort[x].FieldName, payload.Sort[x].BuildSortBy()}})
+		}
 	}
 
 	cursor, err := collection.Find(ctx, payload.Filter, findOption)

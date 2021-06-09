@@ -1,6 +1,7 @@
 package responses
 
 import (
+	"github.com/bpdlampung/banklampung-core-backend-go/entities"
 	"github.com/bpdlampung/banklampung-core-backend-go/errors"
 	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,21 @@ type modelSuccess struct {
 	Success   bool        `json:"success"`
 	Data      interface{} `json:"data"`
 	Timestamp int64       `json:"timestamp"`
+}
+
+type modelPagingSuccess struct {
+	Code      int         `json:"code"`
+	Success   bool        `json:"success"`
+	Data      interface{} `json:"data"`
+	Paging    paging      `json:"paging"`
+	Timestamp int64       `json:"timestamp"`
+}
+
+type paging struct {
+	Page        int64 `json:"page"`
+	TotalPage   int64 `json:"total_page"`
+	ItemPerPage int64 `json:"item_per_page"`
+	TotalItem   int64 `json:"total_item"`
 }
 
 type modelError struct {
@@ -31,6 +47,27 @@ func Success(c *gin.Context, data interface{}) {
 
 	c.JSON(http.StatusOK, modelSuccess{
 		Data:      data,
+		Success:   true,
+		Code:      http.StatusOK,
+		Timestamp: time.Now().Unix(),
+	})
+
+	c.Abort()
+
+	return
+}
+
+func PagingSuccess(c *gin.Context, data interface{}, total int64, pagingFilter entities.Paging) {
+	logs.GetAppLogger().InfoInterface(data)
+
+	c.JSON(http.StatusOK, modelPagingSuccess{
+		Data: data,
+		Paging: paging{
+			Page:        pagingFilter.Page,
+			TotalPage:   total / pagingFilter.ItemPerPage,
+			ItemPerPage: pagingFilter.ItemPerPage,
+			TotalItem:   total,
+		},
 		Success:   true,
 		Code:      http.StatusOK,
 		Timestamp: time.Now().Unix(),

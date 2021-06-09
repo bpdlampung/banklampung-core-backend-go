@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type Audit struct {
-	Id          string    `bson:"_id,omitempty"`
+	Id          string    `bson:"_id,omitempty" json:"id"`
 	CreatedBy   *User     `bson:"createdBy,omitempty"`
 	CreatedDate time.Time `bson:"createdDate"`
 	UpdatedBy   *User     `bson:"updatedBy,omitempty"`

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 )
 
 // Adapted from https://elithrar.github.io/article/generating-secure-random-numbers-crypto-rand/
@@ -80,6 +81,22 @@ func RandomStringURLSafe(n int) (string, error) {
 	return base64.URLEncoding.EncodeToString(b), err
 }
 
+func GetEnvAndValidateBool(key string) bool {
+	value := os.Getenv(key)
+
+	if len(value) == 0 {
+		panic(fmt.Sprintf("env [%s] not found", key))
+	}
+
+	b, err := strconv.ParseBool(value)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return b
+}
+
 func GetEnvAndValidate(key string) string {
 	value := os.Getenv(key)
 
@@ -88,4 +105,12 @@ func GetEnvAndValidate(key string) string {
 	}
 
 	return value
+}
+
+func IsPresent(str *string) bool {
+	if str != nil && len(*str) > 0 {
+		return true
+	}
+
+	return false
 }
