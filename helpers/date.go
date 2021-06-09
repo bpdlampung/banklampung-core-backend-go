@@ -10,8 +10,8 @@ type DateTime struct {
 	time.Time
 }
 
-const dateTimeFormat = "2006-01-02 15:04:05"
-const dateFormat = "2006-01-02"
+const dateTimeFormat = "02-01-2006 15:04:05"
+const dateFormat = "02-01-2006"
 
 func (ct *DateTime) UnmarshalJSON(b []byte) (err error) {
 	s := strings.Trim(string(b), "\"")
