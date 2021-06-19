@@ -1,8 +1,8 @@
 package entities
 
 type Department struct {
-	Code     string `bson:"code" json:"code"`
-	Name     string `bson:"name" json:"name"`
-	Type     string `bson:"type" json:"type"`
-	TypeCode string `bson:"typeCode" json:"type_code"`
+	Code     string `bson:"code,omitempty" json:"code,omitempty"`
+	Name     string `bson:"name,omitempty" json:"name,omitempty"`
+	Type     string `bson:"type,omitempty" json:"type,omitempty"`
+	TypeCode string `bson:"typeCode,omitempty" json:"type_code,omitempty"`
 }

@@ -96,6 +96,10 @@ func (m MongoDBLogger) Find(payload FindAllData, ctx context.Context) error {
 		}
 	}
 
+	marshaledResp, _ := json.Marshal(payload.Result)
+	marshaledCount, _ := json.Marshal(payload.CountData)
+	m.mongodb.logger.Info(fmt.Sprintf("Success Find Collection: %s, Filter: %s, Result: %s, CountData: %s", m.collectionName, payload.Filter, string(marshaledResp), string(marshaledCount)))
+
 	return nil
 }
 
@@ -165,6 +169,10 @@ func (m MongoDBLogger) FindOne(payload FindOne, ctx context.Context) error {
 		msg := fmt.Sprintf("slow query: %v second, query: %s", finish.Sub(start).Seconds(), string(j))
 		m.mongodb.logger.Debug(msg)
 	}
+
+	marshaledResp, _ := json.Marshal(payload.Result)
+	m.mongodb.logger.Info(fmt.Sprintf("Success FindOne Collection: %s, Filter: %s, Result: %s", m.collectionName, payload.Filter, string(marshaledResp)))
+
 	return nil
 }
 
@@ -250,6 +258,8 @@ func (m MongoDBLogger) UpdateOne(payload UpdateOne, ctx context.Context) error {
 		msg := fmt.Sprintf("slow query: %v second, query: %s", finish.Sub(start).Seconds(), string(j))
 		m.mongodb.logger.Debug(msg)
 	}
+
+	m.mongodb.logger.Info(fmt.Sprintf("Success UpdateOne Collection: %s, Data: %s", m.collectionName, payload.Document))
 
 	return nil
 }

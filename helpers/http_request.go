@@ -80,6 +80,12 @@ func HttpRequest(payload HttpRequestPayload) error {
 		req.Header = *payload.Header
 	}
 
+	payload.Logger.Info(fmt.Sprintf("URL | %v", payload.Url))
+	payload.Logger.Info(fmt.Sprintf("Method | %v", payload.Method))
+	marshaledRequestBody, _ := json.Marshal(payload.Body)
+	payload.Logger.Info(fmt.Sprintf("[Request] Body | %v", string(marshaledRequestBody)))
+	payload.Logger.Info(fmt.Sprintf("[Request] QueryParam | %v", payload.QueryParams))
+
 	// --- do request
 
 	timeout := 10 * time.Second
@@ -108,6 +114,8 @@ func HttpRequest(payload HttpRequestPayload) error {
 
 	defer resp.Body.Close()
 
+	payload.Logger.Info(fmt.Sprintf("[Response] StatusCode | %v", resp.StatusCode))
+
 	if resp.StatusCode != http.StatusOK {
 		readResp, _ := ioutil.ReadAll(resp.Body)
 		payload.Logger.Error(string(readResp))
@@ -122,11 +130,88 @@ func HttpRequest(payload HttpRequestPayload) error {
 		return err
 	}
 
+	payload.Logger.Info(fmt.Sprintf("[Response] Body | %v", string(readResp)))
+
 	if err := json.Unmarshal(readResp, &payload.Result); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+type HttpRequestWithResponsePayload struct {
+	Method      string
+	Url         string
+	QueryParams map[string]string
+	Body        interface{}
+	Logger      logs.Log
+	Client      *http.Client
+	TimeoutReq  *time.Duration // default 10s
+	Header      *http.Header
+}
+
+func HttpRequestWithResponse(payload HttpRequestWithResponsePayload) (*http.Response, error) {
+	var bodyByte []byte
+
+	if payload.Body != nil {
+		reqBody, err := json.Marshal(payload.Body)
+
+		if err != nil {
+			return nil, err
+		}
+
+		bodyByte = reqBody
+	}
+
+	req, err := http.NewRequest(payload.Method, payload.Url, bytes.NewBuffer(bodyByte))
+
+	if err != nil {
+		return nil, err
+	}
+
+	if payload.QueryParams != nil {
+		q := req.URL.Query()
+
+		for key, val := range payload.QueryParams {
+			q.Set(key, val)
+		}
+
+		req.URL.RawQuery = q.Encode()
+	}
+
+	if payload.Header == nil {
+		req.Header.Set("Content-Type", ContentTypeApplicationJson)
+	} else {
+		req.Header = *payload.Header
+	}
+
+	// --- do request
+
+	timeout := 10 * time.Second
+
+	if payload.TimeoutReq != nil {
+		timeout = *payload.TimeoutReq
+	}
+
+	newClient := http.Client{
+		Timeout: timeout,
+	}
+
+	if payload.Client != nil {
+		newClient = *payload.Client
+	}
+
+	resp, err := newClient.Do(req)
+
+	if err, ok := err.(net.Error); ok && err.Timeout() {
+		return resp, errors.BadRequest("request timeout.")
+	}
+
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 func GenerateBasicAuth(username, password string) string {
