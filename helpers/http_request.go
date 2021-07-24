@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 )
 
@@ -217,4 +219,92 @@ func HttpRequestWithResponse(payload HttpRequestWithResponsePayload) (*http.Resp
 func GenerateBasicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+type HttpRequestUrlEncodedPayload struct {
+	Method     string
+	Url        string
+	FormData   map[string]string
+	Result     interface{}
+	Logger     logs.Log
+	Client     *http.Client
+	TimeoutReq *time.Duration // default 10s
+	Header     *http.Header
+}
+
+func HttpRequestFormUrlEncoded(payload HttpRequestUrlEncodedPayload) error {
+	data := url.Values{}
+	if payload.FormData != nil {
+		for key, val := range payload.FormData {
+			data.Set(key, val)
+		}
+	}
+
+	req, err := http.NewRequest(payload.Method, payload.Url, strings.NewReader(data.Encode()))
+
+	if err != nil {
+		return err
+	}
+
+	if payload.Header == nil {
+		req.Header.Set("Content-Type", ContentTypeApplicationFormUrlEncoded)
+	} else {
+		req.Header = *payload.Header
+	}
+
+	payload.Logger.Info(fmt.Sprintf("URL | %v", payload.Url))
+	payload.Logger.Info(fmt.Sprintf("Method | %v", payload.Method))
+	payload.Logger.Info(fmt.Sprintf("[Request] FormData | %v", payload.FormData))
+
+	// --- do request
+
+	timeout := 10 * time.Second
+
+	if payload.TimeoutReq != nil {
+		timeout = *payload.TimeoutReq
+	}
+
+	newClient := http.Client{
+		Timeout: timeout,
+	}
+
+	if payload.Client != nil {
+		newClient = *payload.Client
+	}
+
+	resp, err := newClient.Do(req)
+
+	if err, ok := err.(net.Error); ok && err.Timeout() {
+		return errors.BadRequest("request timeout.")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	payload.Logger.Info(fmt.Sprintf("[Response] StatusCode | %v", resp.StatusCode))
+
+	if resp.StatusCode != http.StatusOK {
+		readResp, _ := ioutil.ReadAll(resp.Body)
+		payload.Logger.Error(string(readResp))
+		payload.Logger.Error(fmt.Sprintf("%v", resp.StatusCode))
+
+		return errors.BadRequest("request error.")
+	}
+
+	readResp, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return err
+	}
+
+	payload.Logger.Info(fmt.Sprintf("[Response] Body | %v", string(readResp)))
+
+	if err := json.Unmarshal(readResp, &payload.Result); err != nil {
+		return err
+	}
+
+	return nil
 }
