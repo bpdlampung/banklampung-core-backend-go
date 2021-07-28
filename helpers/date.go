@@ -95,11 +95,11 @@ func TimeNowUTC() time.Time {
 }
 
 func StringDateNow() string {
-	return TimeNow().Format(DateFormat);
+	return TimeNow().Format(DateFormat)
 }
 
 func StringDateTimeNow() string {
-	return TimeNow().Format(DateTimeFormat);
+	return TimeNow().Format(DateTimeFormat)
 }
 
 func DateToStringUTC(date time.Time) string {

@@ -8,8 +8,12 @@ import (
 	"strconv"
 )
 
-var redisClient *redis.Client
-var logger logs.Collections
+type Redis struct {
+	client *redis.Client
+	logger logs.Collections
+}
+
+var redisClient Redis
 
 func InitConnection(redisDB, redisHost, redisPort, redisPassword string, logger logs.Collections) Collections {
 	db := 0
@@ -33,8 +37,14 @@ func InitConnection(redisDB, redisHost, redisPort, redisPassword string, logger 
 
 	logger.Info("Redis Connected")
 
-	redisClient = client
-	logger = logger
+	redisClient = Redis{
+		client: client,
+		logger: logger,
+	}
 
+	return redisClient
+}
+
+func GetClient() Collections {
 	return redisClient
 }
