@@ -15,7 +15,7 @@ type Redis struct {
 
 var redisClient Redis
 
-func InitConnection(redisDB, redisHost, redisPort, redisPassword string, logger logs.Collections) Collections {
+func InitConnection(redisDB, redisHost, redisPort, redisPassword string, logger logs.Collections) Redis {
 	db := 0
 
 	parseRedisDb, err := strconv.ParseInt(redisDB, 10, 32)
