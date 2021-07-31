@@ -157,6 +157,26 @@ func EndOfDayUTC() time.Time {
 	return time.Date(y, m, d, 23, 59, 59, int(time.Second-time.Nanosecond), timeNow.Location()).UTC()
 }
 
+func StringToEndOfDayDateUTC(date *string) *Date {
+	if date == nil {
+		return nil
+	}
+
+	locName := GetEnvAndValidate("TZ")
+	loc, _ := time.LoadLocation(locName)
+	dateF, err := time.ParseInLocation(DateFormat, *date, loc)
+
+	if err != nil {
+		panic(err)
+	}
+
+	y, m, d := dateF.Date()
+
+	return &Date{
+		time.Date(y, m, d, 23, 59, 59, int(time.Second-time.Nanosecond), dateF.Location()).UTC(),
+	}
+}
+
 func EndOfDayDateTime() DateTime {
 	timeNow := TimeNow()
 
