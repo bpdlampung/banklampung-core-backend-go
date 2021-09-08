@@ -9,6 +9,7 @@ import (
 const DateTimeFormat = "02-01-2006 15:04:05"
 const DateFormat = "02-01-2006"
 const DateTimeISOFormat = "2006-01-02T15:04:05.000Z"
+const DateISOFormat = "2006-01-02"
 
 // time database to Asia/Jakarta
 func DateTimeToString(dateTime time.Time) string {
@@ -243,4 +244,12 @@ func (ct *Date) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	return []byte(fmt.Sprintf("\"%s\"", ct.Time.Format(DateFormat))), nil
+}
+
+func (ct *Date) ToStringFormat() string {
+	return ct.Time.Format(DateFormat)
+}
+
+func (ct *Date) ToStringISOFormat() string {
+	return ct.Time.Format(DateISOFormat)
 }

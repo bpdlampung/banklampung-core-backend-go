@@ -103,6 +103,69 @@ func (m MongoDBLogger) Find(payload FindAllData, ctx context.Context) error {
 	return nil
 }
 
+type FindAll struct {
+	Result    interface{}
+	CountData *int64
+	Filter    interface{}
+	Sort      []entities.Sort
+}
+
+func (m MongoDBLogger) FindAll(payload FindAll, ctx context.Context) error {
+	start := time.Now()
+
+	collection := m.mongodb.client.Database(m.mongodb.dbname).Collection(m.collectionName)
+
+	findOption := options.Find()
+
+	if payload.Sort != nil && len(payload.Sort) > 0 {
+		for x := range payload.Sort {
+			findOption.SetSort(bson.D{{payload.Sort[x].FieldName, payload.Sort[x].BuildSortBy()}})
+		}
+	}
+
+	cursor, err := collection.Find(ctx, payload.Filter, findOption)
+
+	if err != nil {
+		msg := fmt.Sprintf("Error Mongodb Connection : %s", err.Error())
+		m.mongodb.logger.Error(msg)
+		return errors.InternalServerError(msg)
+	}
+
+	defer cursor.Close(ctx)
+
+	if err := cursor.All(ctx, payload.Result); err != nil {
+		msg := "cannot unmarshal result"
+		m.mongodb.logger.Error(msg)
+		return errors.InternalServerError(msg)
+	}
+
+	finish := time.Now()
+
+	if finish.Sub(start).Seconds() > 10 {
+		j, _ := json.Marshal(payload.Filter)
+		msg := fmt.Sprintf("slow query: %v second, query: %s", finish.Sub(start).Seconds(), string(j))
+		m.mongodb.logger.Debug(msg)
+	}
+
+	// handle countdata
+	if payload.CountData != nil {
+		err := m.Count(CountData{
+			Result: payload.CountData,
+			Filter: payload.Filter,
+		}, ctx)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	marshaledResp, _ := json.Marshal(payload.Result)
+	marshaledCount, _ := json.Marshal(payload.CountData)
+	m.mongodb.logger.Info(fmt.Sprintf("Success Find Collection: %s, Filter: %s, Result: %s, CountData: %s", m.collectionName, payload.Filter, string(marshaledResp), string(marshaledCount)))
+
+	return nil
+}
+
 type CountData struct {
 	Result *int64
 	Filter interface{}
@@ -275,52 +338,6 @@ func (m MongoDBLogger) Aggregate(payload Aggregate, ctx context.Context) error {
 	collection := m.mongodb.client.Database(m.mongodb.dbname).Collection(m.collectionName)
 
 	cursor, err := collection.Aggregate(ctx, payload.Filter)
-
-	if err != nil {
-		msg := fmt.Sprintf("Error Mongodb Connection : %s", err.Error())
-		m.mongodb.logger.Error(msg)
-		return errors.InternalServerError(msg)
-	}
-
-	defer cursor.Close(ctx)
-
-	if err := cursor.All(ctx, payload.Result); err != nil {
-		msg := "cannot unmarshal result"
-		m.mongodb.logger.Error(msg)
-		return errors.InternalServerError(msg)
-	}
-
-	finish := time.Now()
-
-	if finish.Sub(start).Seconds() > 10 {
-		j, _ := json.Marshal(payload.Filter)
-		msg := fmt.Sprintf("slow query: %v second, query: %s", finish.Sub(start).Seconds(), string(j))
-		m.mongodb.logger.Debug(msg)
-	}
-
-	return nil
-}
-
-type FindMany struct {
-	Result interface{}
-	Filter interface{}
-	Sort   []entities.Sort
-}
-
-func (m MongoDBLogger) FindMany(payload FindMany, ctx context.Context) error {
-	start := time.Now()
-
-	collection := m.mongodb.client.Database(m.mongodb.dbname).Collection(m.collectionName)
-
-	findOption := options.Find()
-
-	if payload.Sort != nil && len(payload.Sort) > 0 {
-		for x := range payload.Sort {
-			findOption.SetSort(bson.D{{payload.Sort[x].FieldName, payload.Sort[x].BuildSortBy()}})
-		}
-	}
-
-	cursor, err := collection.Find(ctx, payload.Filter, findOption)
 
 	if err != nil {
 		msg := fmt.Sprintf("Error Mongodb Connection : %s", err.Error())

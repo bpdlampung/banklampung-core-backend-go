@@ -79,31 +79,23 @@ func PagingSuccess(c *gin.Context, data interface{}, total int64, pagingFilter e
 }
 
 func Error(c *gin.Context, error error) {
-	statusCode := getErrorStatusCode(error)
-	errorMsg := error.Error()
-
 	logs.GetAppLogger().Error(error.Error())
 
-	c.JSON(statusCode, modelError{
-		Success: false,
-		Code:    statusCode,
-		Message: &struct {
-			Indonesian *string `json:"indonesian"`
-			English    *string `json:"english"`
-		}{Indonesian: &errorMsg, English: &errorMsg},
-		Timestamp: time.Now().Unix(),
-	})
-
-	c.Abort()
-
-	return
-}
-
-func ErrorWithErrorCode(c *gin.Context, error error, errorCode string) {
 	statusCode := getErrorStatusCode(error)
-	errorMsg := error.Error()
+	errorCode := errors.DefaultErrorCode
+	errorMsgEn := error.Error()
+	errorMsgId := error.Error()
 
-	logs.GetAppLogger().Error(error.Error())
+	if getErrorResponseCode(error) != "-" {
+		errorInfo := errors.GetErrorInfo(getErrorResponseCode(error))
+
+		statusCode = errorInfo.StatusCode
+		errorCode = errorInfo.ErrorCode
+		if errorInfo.ErrorCode == errors.DefaultErrorCode || getErrorMessage(error) == "-" {
+			errorMsgEn = errorInfo.MsgEn
+			errorMsgId = errorInfo.MsgId
+		}
+	}
 
 	c.JSON(statusCode, modelError{
 		ErrorCode: errorCode,
@@ -112,7 +104,7 @@ func ErrorWithErrorCode(c *gin.Context, error error, errorCode string) {
 		Message: &struct {
 			Indonesian *string `json:"indonesian"`
 			English    *string `json:"english"`
-		}{Indonesian: &errorMsg, English: &errorMsg},
+		}{Indonesian: &errorMsgId, English: &errorMsgEn},
 		Timestamp: time.Now().Unix(),
 	})
 
@@ -177,12 +169,33 @@ func ErrorWithEnMessage(c *gin.Context, statusCode int, messageEn, errorCode str
 	return
 }
 
+func getErrorResponseCode(err error) string {
+	errString, ok := err.(*errors.ErrorString)
+
+	if ok && errString.ResponseCode() != "" {
+		return errString.ResponseCode()
+	}
+
+	return "-"
+}
+
 func getErrorStatusCode(err error) int {
 	errString, ok := err.(*errors.ErrorString)
-	if ok {
-		return errString.Code()
+
+	if ok && errString.StatusCode() != 0 {
+		return errString.StatusCode()
 	}
 
 	// default http status code
 	return http.StatusInternalServerError
+}
+
+func getErrorMessage(err error) string {
+	errString, ok := err.(*errors.ErrorString)
+
+	if ok && errString.Message() != "" {
+		return errString.Message()
+	}
+
+	return "-"
 }

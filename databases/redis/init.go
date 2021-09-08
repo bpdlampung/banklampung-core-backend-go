@@ -45,6 +45,14 @@ func InitConnection(redisDB, redisHost, redisPort, redisPassword string, logger 
 	return redisClient
 }
 
+func (r Redis) GetRedisClient() *redis.Client {
+	return r.client
+}
+
+func (r Redis) GetRedisLogger() logs.Collections {
+	return r.logger
+}
+
 func GetClient() Collections {
 	return redisClient
 }

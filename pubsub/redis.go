@@ -2,11 +2,15 @@ package pubsub
 
 import (
 	"context"
+	"fmt"
+	goRedis "github.com/bpdlampung/banklampung-core-backend-go/databases/redis"
+	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"github.com/go-redis/redis/v8"
 )
 
 type redisPubSub struct {
-	rc *redis.Client
+	rc     *redis.Client
+	logger logs.Collections
 }
 
 type redisSubscription struct {
@@ -15,6 +19,8 @@ type redisSubscription struct {
 
 func (r *redisPubSub) Publish(ctx context.Context, topic string, data []byte) error {
 	_, err := r.rc.Publish(ctx, topic, data).Result()
+	r.logger.Info(fmt.Sprintf("Publish with topic: %s - %s", topic, string(data)))
+
 	return err
 }
 
@@ -38,6 +44,9 @@ func (r *redisSubscription) Unsubscribe() error {
 	return err
 }
 
-func RedisPubSub(rc *redis.Client) PubSub {
-	return &redisPubSub{rc: rc}
+func RedisPubSub(rc goRedis.Redis) PubSub {
+	return &redisPubSub{
+		rc:     rc.GetRedisClient(),
+		logger: rc.GetRedisLogger(),
+	}
 }
