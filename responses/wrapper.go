@@ -1,11 +1,13 @@
 package responses
 
 import (
+	"fmt"
 	"github.com/bpdlampung/banklampung-core-backend-go/entities"
 	"github.com/bpdlampung/banklampung-core-backend-go/errors"
 	"github.com/bpdlampung/banklampung-core-backend-go/logs"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"runtime"
 	"time"
 )
 
@@ -79,6 +81,20 @@ func PagingSuccess(c *gin.Context, data interface{}, total int64, pagingFilter e
 }
 
 func Error(c *gin.Context, error error) {
+
+	stacktrace := fmt.Sprintf(" Message: %s", error.Error())
+
+	for i := 1; i <= 10; i++ {
+		pc, file, line, _ := runtime.Caller(i)
+		f := runtime.FuncForPC(pc)
+		if f == nil || line == 0 {
+			break
+		}
+
+		stacktrace += fmt.Sprintf("\n --- at %s:%d ---", file, line)
+	}
+
+	logs.GetAppLogger().Error(stacktrace)
 	logs.GetAppLogger().Error(error.Error())
 
 	statusCode := getErrorStatusCode(error)

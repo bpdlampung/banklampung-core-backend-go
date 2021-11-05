@@ -26,7 +26,7 @@ func NewMongoDBLogger(mongoClient Mongodb, collectionName string) Collections {
 	}
 }
 
-type FindAllData struct {
+type Find struct {
 	Result    interface{}
 	CountData *int64
 	Filter    interface{}
@@ -35,12 +35,12 @@ type FindAllData struct {
 	Size      int64
 }
 
-func (f FindAllData) generateOptionSkip() *int64 {
+func (f Find) generateOptionSkip() *int64 {
 	skipNumber := f.Size * (f.Page - 1)
 	return &skipNumber
 }
 
-func (m MongoDBLogger) Find(payload FindAllData, ctx context.Context) error {
+func (m MongoDBLogger) Find(payload Find, ctx context.Context) error {
 	start := time.Now()
 
 	collection := m.mongodb.client.Database(m.mongodb.dbname).Collection(m.collectionName)

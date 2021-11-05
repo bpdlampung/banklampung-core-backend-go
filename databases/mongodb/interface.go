@@ -4,7 +4,7 @@ import "context"
 
 // Collections is mongodb's collection of function
 type Collections interface {
-	Find(payload FindAllData, ctx context.Context) error
+	Find(payload Find, ctx context.Context) error
 	FindAll(payload FindAll, ctx context.Context) error // without page and size
 	Count(payload CountData, ctx context.Context) error
 	FindOne(payload FindOne, ctx context.Context) error

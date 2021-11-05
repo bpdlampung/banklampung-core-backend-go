@@ -5,10 +5,12 @@ go 1.15
 require (
 	github.com/Shopify/sarama v1.28.0
 	github.com/devfeel/mapper v0.7.5
+	github.com/getsentry/sentry-go v0.11.0 // indirect
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/minio/minio-go/v7 v7.0.14
 	github.com/nsqio/go-nsq v1.0.8
 	github.com/rs/zerolog v1.21.0
 	github.com/satori/go.uuid v1.2.0

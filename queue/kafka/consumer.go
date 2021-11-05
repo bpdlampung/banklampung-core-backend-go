@@ -80,7 +80,7 @@ type HandlerConsumer interface {
 }
 
 /**
- * HandlerFunc is a convenience type to avoid having to declare a struct
+ * HandlerFunc is a convenience type to avoid having to declare a structs
  * to implement the Handler interface, it can be used like this:
  *
  * handlers := qKafka.HandlerFunc(func(m *qKafka.Message) error {
