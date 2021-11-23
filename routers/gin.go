@@ -33,7 +33,7 @@ func CatchError() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				responses.Error(c, errors.InternalServerError(fmt.Sprintf("Something when wrong, Panic System :: %v", err)))
+				responses.Error(c, errors.InternalServerError(fmt.Sprintf("Something when wrong, %v", err)))
 			}
 		}()
 		c.Next()

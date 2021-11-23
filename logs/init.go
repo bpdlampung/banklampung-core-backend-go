@@ -19,10 +19,15 @@ type Log struct {
 var appLogger Log
 
 func init() {
-	appLogger = NewLogger("app")
+	app := "app"
+
+	appLogger = NewLogger(app)
+
+	_, logDirectory := getDirectory(app)
+	go rotation(logDirectory)
 }
 
-func getDirectory(location *time.Location, serviceName string) io.Writer {
+func getDirectory(serviceName string) (io.Writer, string) {
 	appName, ok := os.LookupEnv("APP_NAME")
 
 	if !ok {
@@ -68,7 +73,7 @@ func getDirectory(location *time.Location, serviceName string) io.Writer {
 		panic(err.Error())
 	}
 
-	return io.MultiWriter(f, os.Stdout)
+	return io.MultiWriter(f, os.Stdout), fmt.Sprintf("%s/%s", logRootDir, appDir)
 }
 
 func NewLogger(serviceName string) (logger Log) {
@@ -78,14 +83,7 @@ func NewLogger(serviceName string) (logger Log) {
 		panic(err)
 	}
 
-	//pwd, err := os.Getwd()
-	//pwd, err := filepath.Abs("./")
-
-	//if err != nil {
-	//	panic(err)
-	//}
-
-	writer := getDirectory(loc, serviceName)
+	writer, _ := getDirectory(serviceName)
 
 	zerolog.TimestampFunc = func() time.Time {
 		return time.Now().In(loc)

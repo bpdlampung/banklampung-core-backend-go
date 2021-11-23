@@ -25,6 +25,6 @@ func InitConnection(DSN string) Sentry {
 
 func (s Sentry) RegisterToRouter(ginRouter *gin.Engine) {
 	ginRouter.Use(sentrygin.New(sentrygin.Options{
-		Repanic:         true,
+		Repanic: true,
 	}))
 }

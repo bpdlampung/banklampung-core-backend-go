@@ -33,7 +33,7 @@ type paging struct {
 	TotalItem   int64 `json:"total_item"`
 }
 
-type modelError struct {
+type ModelError struct {
 	Code      int    `json:"code"`
 	ErrorCode string `json:"error_code,omitempty"`
 	Success   bool   `json:"success"`
@@ -113,7 +113,7 @@ func Error(c *gin.Context, error error) {
 		}
 	}
 
-	c.JSON(statusCode, modelError{
+	c.JSON(statusCode, ModelError{
 		ErrorCode: errorCode,
 		Success:   false,
 		Code:      statusCode,
@@ -131,7 +131,7 @@ func Error(c *gin.Context, error error) {
 func ErrorWithMessage(c *gin.Context, statusCode int, messageId, messageEn, errorCode string) {
 	logs.GetAppLogger().Error(messageId)
 
-	c.JSON(statusCode, modelError{
+	c.JSON(statusCode, ModelError{
 		ErrorCode: errorCode,
 		Success:   false,
 		Code:      statusCode,
@@ -150,7 +150,7 @@ func ErrorWithMessage(c *gin.Context, statusCode int, messageId, messageEn, erro
 func ErrorWithIdMessage(c *gin.Context, statusCode int, messageId, errorCode string) {
 	logs.GetAppLogger().Error(messageId)
 
-	c.JSON(statusCode, modelError{
+	c.JSON(statusCode, ModelError{
 		ErrorCode: errorCode,
 		Success:   false,
 		Code:      statusCode,
@@ -169,7 +169,7 @@ func ErrorWithIdMessage(c *gin.Context, statusCode int, messageId, errorCode str
 func ErrorWithEnMessage(c *gin.Context, statusCode int, messageEn, errorCode string) {
 	logs.GetAppLogger().Error(messageEn)
 
-	c.JSON(statusCode, modelError{
+	c.JSON(statusCode, ModelError{
 		ErrorCode: errorCode,
 		Success:   false,
 		Code:      statusCode,

@@ -20,6 +20,8 @@ const (
 	ContentTypeApplicationFormUrlEncoded = "application/x-www-form-urlencoded"
 )
 
+var ErrRequestTimeout = errors.BadRequest("Request Timeout")
+
 type HttpConfig struct {
 	HttpClient *http.Client
 	Timeout    *time.Duration
@@ -35,6 +37,8 @@ func (c HttpConfig) BuildBaseUrl() string {
 	return c.Host
 }
 
+type Converter func(body interface{}, logger logs.Log, httpResponse *http.Response, err error) error
+
 type HttpRequestPayload struct {
 	Method      string
 	Url         string
@@ -45,6 +49,7 @@ type HttpRequestPayload struct {
 	Client      *http.Client
 	TimeoutReq  *time.Duration // default 10s
 	Header      *http.Header
+	Converter   Converter
 }
 
 func HttpRequest(payload HttpRequestPayload) error {
@@ -106,8 +111,12 @@ func HttpRequest(payload HttpRequestPayload) error {
 
 	resp, err := newClient.Do(req)
 
+	if payload.Converter != nil {
+		return payload.Converter(payload.Result, payload.Logger, resp, err)
+	}
+
 	if err, ok := err.(net.Error); ok && err.Timeout() {
-		return errors.BadRequest("request timeout.")
+		return ErrRequestTimeout
 	}
 
 	if err != nil {
@@ -206,7 +215,7 @@ func HttpRequestWithResponse(payload HttpRequestWithResponsePayload) (*http.Resp
 	resp, err := newClient.Do(req)
 
 	if err, ok := err.(net.Error); ok && err.Timeout() {
-		return resp, errors.BadRequest("request timeout.")
+		return resp, ErrRequestTimeout
 	}
 
 	if err != nil {
