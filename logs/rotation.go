@@ -81,8 +81,6 @@ func rotation(logDirectory string) {
 			continue
 		}
 
-		startDate = dateNow
-
 		logFiles, _ := ioutil.ReadDir(logDirectory)
 
 		var logFilesName []string
@@ -92,7 +90,7 @@ func rotation(logDirectory string) {
 		}
 
 		if len(logFilesName) > 0 {
-			err := zipFiles(fmt.Sprintf("%s-%s.zip", logDirectory, dateNow), logFilesName); if err != nil {
+			err := zipFiles(fmt.Sprintf("%s-%s.zip", logDirectory, startDate), logFilesName); if err != nil {
 				panic(err)
 			}
 
@@ -100,9 +98,10 @@ func rotation(logDirectory string) {
 				_ = os.Remove(f)
 			}
 
-			fmt.Println(fmt.Sprintf("Comppress Log %s Success....", dateNow))
+			fmt.Println(fmt.Sprintf("Comppress Log %s Success....", startDate))
 		}
 
+		startDate = dateNow
 		time.Sleep(5 * time.Second)
 	}
 }
