@@ -7,10 +7,6 @@ import (
 	"time"
 )
 
-func TimeToString(time time.Time, format string) string {
-	return time.Format(format)
-}
-
 func StringToTime(stringTime, format string, locKey *string) (dateTime time.Time) {
 	locName := helpers.GetEnvAndValidate("TZ")
 	loc, _ := time.LoadLocation(locName)

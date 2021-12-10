@@ -110,7 +110,7 @@ func toStringValueFromTag2(val reflect.Value, tag, tagName string) string {
 		tagField := typeField.Tag
 
 		if valueField.Kind() == reflect.Struct {
-			result = toStringValueFromTag2(valueField, tag, tagName)
+			return toStringValueFromTag2(valueField, tag, tagName)
 		}
 
 		//fmt.Println(tagField.Get(tag))
@@ -143,17 +143,19 @@ func toUpdateMongoEntity(val reflect.Value) interface{} {
 	for i := 0; i < val.NumField(); i++ {
 		valueField := val.Field(i)
 		typeField := val.Type().Field(i)
-		tag := typeField.Tag
+		tagField := typeField.Tag
 
 		if valueField.Kind() == reflect.Struct {
 			toUpdateMongoEntity(valueField)
 		}
 
-		if array.InArray("updated_date", strings.Split(tag.Get("bson"), ",")) == "updated_date" {
+		if array.InArray("updated_date", strings.Split(tagField.Get("bson"), ",")) == "updated_date" {
+			//fmt.Printf("Field Name: %s,\t Field Value: %v,\t Tag Value: %s\n", typeField.Name, valueField.Interface(), tagField.Get("updated_date"))
 			valueField.Set(reflect.ValueOf(date.TimeNowUTC()))
 		}
 
-		if array.InArray("version", strings.Split(tag.Get("bson"), ",")) == "version" {
+		if array.InArray("version", strings.Split(tagField.Get("bson"), ",")) == "version" {
+			//fmt.Printf("Field Name: %s,\t Field Value: %v,\t Tag Value: %s\n", typeField.Name, valueField.Interface(), tagField.Get("version"))
 			valueField.SetUint(valueField.Uint() + 1)
 		}
 	}

@@ -39,8 +39,10 @@ func (i implementTemplateRepository) Save(obj interface{}) error {
 }
 
 func (i implementTemplateRepository) Update(obj interface{}) error {
-	if len(structs.GetStringValueFromStruct(obj, "bson", "_id")) == 0 {
-		panic("_id is required")
+	objId := structs.GetStringValueFromStruct(obj, "bson", "_id")
+
+	if len(objId) == 0 || objId == "-" {
+		panic("_id is required ::" + objId)
 	}
 
 	err := i.mongodb.UpdateOne(UpdateOne{
