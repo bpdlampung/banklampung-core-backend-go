@@ -361,5 +361,7 @@ func (m MongoDBLogger) Aggregate(payload Aggregate, ctx context.Context) error {
 		m.mongodb.logger.Debug(msg)
 	}
 
+	m.mongodb.logger.Info(fmt.Sprintf("Success Aggregate Collection: %s, Data: %s", m.collectionName, payload.Filter))
+
 	return nil
 }

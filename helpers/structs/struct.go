@@ -96,12 +96,12 @@ func GetStringValueFromStruct(object interface{}, tag, tagName string) string {
 		panic("unexpected type, must structs")
 	}
 
-	return toStringValueFromTag2(val, tag, tagName)
+	return toStringValueFromTag(val, tag, tagName)
 }
 
 // Tag -> qtag
 // TagName -> version, id, etc...
-func toStringValueFromTag2(val reflect.Value, tag, tagName string) string {
+func toStringValueFromTag(val reflect.Value, tag, tagName string) string {
 	result := "-"
 
 	for i := 0; i < val.NumField(); i++ {
@@ -110,7 +110,11 @@ func toStringValueFromTag2(val reflect.Value, tag, tagName string) string {
 		tagField := typeField.Tag
 
 		if valueField.Kind() == reflect.Struct {
-			return toStringValueFromTag2(valueField, tag, tagName)
+			if tempOfResult := toStringValueFromTag(valueField, tag, tagName); tempOfResult != "-" {
+				return tempOfResult
+			}
+
+			continue
 		}
 
 		//fmt.Println(tagField.Get(tag))
@@ -147,6 +151,7 @@ func toUpdateMongoEntity(val reflect.Value) interface{} {
 
 		if valueField.Kind() == reflect.Struct {
 			toUpdateMongoEntity(valueField)
+			continue
 		}
 
 		if array.InArray("updated_date", strings.Split(tagField.Get("bson"), ",")) == "updated_date" {
@@ -187,6 +192,7 @@ func toCreateMongoEntity(val reflect.Value) interface{} {
 
 		if valueField.Kind() == reflect.Struct {
 			toCreateMongoEntity(valueField)
+			continue
 		}
 
 		if array.InArray("updated_date", strings.Split(tag.Get("bson"), ",")) == "updated_date" {
