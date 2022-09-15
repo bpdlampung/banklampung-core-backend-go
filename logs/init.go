@@ -1,7 +1,6 @@
 package logs
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/rs/zerolog"
 	"io"
@@ -138,8 +137,8 @@ func (log Log) Info(message string) {
 }
 
 func (log Log) InfoInterface(data interface{}) {
-	marshaledData, _ := json.Marshal(data)
-	log.logger.Info().Msg(string(marshaledData))
+	//marshaledData, _ := json.Marshal(data)
+	log.logger.Info().Msg(fmt.Sprintf("%v", data))
 }
 
 func (log Log) Error(message string) {

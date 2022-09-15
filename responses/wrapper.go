@@ -1,6 +1,8 @@
 package responses
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/bpdlampung/banklampung-core-backend-go/entities"
 	"github.com/bpdlampung/banklampung-core-backend-go/errors"
@@ -44,8 +46,23 @@ type ModelError struct {
 	Timestamp int64 `json:"timestamp"`
 }
 
+func prettyPrint(b []byte) []byte {
+	var out bytes.Buffer
+	err := json.Indent(&out, b, "", "  ")
+
+	if err != nil {
+		return b
+	}
+
+	return out.Bytes()
+}
+
 func Success(c *gin.Context, data interface{}) {
-	logs.GetAppLogger().InfoInterface(data)
+	marshaled, _ := json.Marshal(data)
+
+	prettyData := prettyPrint(marshaled)
+
+	logs.GetAppLogger().InfoInterface(fmt.Sprintf("[RESPONSE] path : %s | response : %s", c.FullPath(), string(prettyData)))
 
 	c.JSON(http.StatusOK, modelSuccess{
 		Data:      data,
@@ -60,7 +77,11 @@ func Success(c *gin.Context, data interface{}) {
 }
 
 func PagingSuccess(c *gin.Context, data interface{}, total int64, pagingFilter entities.Paging) {
-	logs.GetAppLogger().InfoInterface(data)
+	marshaled, _ := json.Marshal(data)
+
+	prettyData := prettyPrint(marshaled)
+
+	logs.GetAppLogger().InfoInterface(fmt.Sprintf("[RESPONSE] path : %s | response : %s", c.FullPath(), string(prettyData)))
 
 	c.JSON(http.StatusOK, modelPagingSuccess{
 		Data: data,

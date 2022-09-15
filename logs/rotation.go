@@ -90,7 +90,8 @@ func rotation(logDirectory string) {
 		}
 
 		if len(logFilesName) > 0 {
-			err := zipFiles(fmt.Sprintf("%s-%s.zip", logDirectory, startDate), logFilesName); if err != nil {
+			err := zipFiles(fmt.Sprintf("%s-%s.zip", logDirectory, startDate), logFilesName)
+			if err != nil {
 				panic(err)
 			}
 

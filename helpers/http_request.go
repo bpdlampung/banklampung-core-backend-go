@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -40,16 +41,17 @@ func (c HttpConfig) BuildBaseUrl() string {
 type Converter func(body interface{}, logger logs.Log, httpResponse *http.Response, err error) error
 
 type HttpRequestPayload struct {
-	Method      string
-	Url         string
-	QueryParams map[string]string
-	Body        interface{}
-	Result      interface{}
-	Logger      logs.Log
-	Client      *http.Client
-	TimeoutReq  *time.Duration // default 10s
-	Header      *http.Header
-	Converter   Converter
+	Method             string
+	Url                string
+	QueryParams        map[string]string
+	Body               interface{}
+	Result             interface{}
+	Logger             logs.Log
+	Client             *http.Client
+	TimeoutReq         *time.Duration // default 10s
+	Header             *http.Header
+	Converter          Converter
+	InsecureSkipVerify bool
 }
 
 func HttpRequest(payload HttpRequestPayload) error {
@@ -63,6 +65,10 @@ func HttpRequest(payload HttpRequestPayload) error {
 		}
 
 		bodyByte = reqBody
+	}
+
+	if payload.InsecureSkipVerify {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	req, err := http.NewRequest(payload.Method, payload.Url, bytes.NewBuffer(bodyByte))
