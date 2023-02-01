@@ -11,4 +11,5 @@ type Collections interface {
 	InsertOne(payload InsertOne, ctx context.Context) error
 	UpdateOne(payload UpdateOne, ctx context.Context) error
 	Aggregate(payload Aggregate, ctx context.Context) error
+	DeleteOne(payload DeleteOne, ctx context.Context) error
 }

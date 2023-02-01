@@ -365,3 +365,33 @@ func (m MongoDBLogger) Aggregate(payload Aggregate, ctx context.Context) error {
 
 	return nil
 }
+
+type DeleteOne struct {
+	Filter interface{}
+}
+
+func (m MongoDBLogger) DeleteOne(payload DeleteOne, ctx context.Context) error {
+	start := time.Now()
+
+	collection := m.mongodb.client.Database(m.mongodb.dbname).Collection(m.collectionName)
+
+	_, err := collection.DeleteOne(ctx, payload.Filter)
+
+	if err != nil {
+		msg := fmt.Sprintf("Error Mongodb Connection : %s", err.Error())
+		m.mongodb.logger.Error(msg)
+		return errors.InternalServerError(msg)
+	}
+
+	finish := time.Now()
+
+	if finish.Sub(start).Seconds() > 10 {
+		j, _ := json.Marshal(payload.Filter)
+		msg := fmt.Sprintf("slow query: %v second, query: %s", finish.Sub(start).Seconds(), string(j))
+		m.mongodb.logger.Debug(msg)
+	}
+
+	m.mongodb.logger.Info(fmt.Sprintf("Success DeleteOne Collection: %s, Data: %s", m.collectionName, payload.Filter))
+
+	return nil
+}
